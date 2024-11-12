@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Robo Chatbot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .chat-container {
+            width: 400px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .chat-box {
+            height: 300px;
+            overflow-y: scroll;
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .chat-box p {
+            margin: 0;
+            padding: 5px;
+        }
+        .chat-box p.user-msg {
+            text-align: right;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            padding: 8px;
+        }
+        .chat-box p.bot-msg {
+            text-align: left;
+            background-color: #d1e7ff;
+            border-radius: 5px;
+            padding: 8px;
+        }
+        input[type="text"] {
+            width: calc(100% - 100px);
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        button {
+            width: 80px;
+            padding: 10px;
+            border: none;
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="chat-container">
+        <div class="chat-box" id="chat-box">
+            <!-- Chat messages will appear here -->
+        </div>
+        <form id="chat-form">
+            <input type="text" id="user-message" placeholder="Type your message..." required>
+            <button type="submit">Send</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('chat-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const userMessage = document.getElementById('user-message').value;
+            document.getElementById('user-message').value = ''; // Clear the input field
+
+            // Display user's message in the chat box
+            const userMsgDiv = document.createElement('p');
+            userMsgDiv.classList.add('user-msg');
+            userMsgDiv.textContent = "You: " + userMessage;
+            document.getElementById('chat-box').appendChild(userMsgDiv);
+            
+            // Fetch response from the server
+            fetch('/get_response', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'message=' + encodeURIComponent(userMessage),
+            })
+            .then(response => response.text())
+            .then(data => {
+                // Display bot's response in the chat box
+                const botMsgDiv = document.createElement('p');
+                botMsgDiv.classList.add('bot-msg');
+                botMsgDiv.textContent = data;
+                document.getElementById('chat-box').appendChild(botMsgDiv);
+                
+                // Scroll to the bottom of the chat
+                document.getElementById('chat-box').scrollTop = document.getElementById('chat-box').scrollHeight;
+            });
+        });
+    </script>
+
+</body>
+</html>
